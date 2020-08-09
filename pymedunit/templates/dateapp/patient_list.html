@@ -1,0 +1,39 @@
+{% extends "bootstrap_ui/bootstrap4-skeleton.html" %}
+{% block head-title %}
+    {{show_title}}
+{% endblock %}
+{% block head-javascript %}
+  <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+{% endblock %}
+{% block body-content %}
+  <div class="container">
+  {% include "dateapp/med_nav.html" %}
+  <h1>This is the patient list.</h1>
+  <ul class="list-group">
+    {% for patient in patientDatas %}
+      <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ patient.patient_name }}">
+        <b>{{ patient.patient_name }}</b> | 
+        {{ patient.patient_age }} | 
+        {{ patient.patient_gender }} | 
+        {{ patient.medical_record_num }} | 
+        {{ patient.department }} | 
+        {{ patient.bed_no }} | 
+        {{ patient.clinical_diagnosis }} | 
+        <span class="badge badge-primary badge-pill">{{ patient.dcount }}</span>
+      </button>
+    {% endfor %}
+  </ul>
+  </div>
+
+{% endblock %}
+
+{% block body-javascript %}
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $(".list-group-item").on("click", function(e) {
+      window.location.href = '/patient_info/' + $(this).val(); 
+      // alert($(this).val());
+    })
+  });
+  </script>
+{% endblock %}

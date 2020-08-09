@@ -1,0 +1,52 @@
+{% extends "dateapp/base.html" %}
+
+{% block title %}{{ show_title }}{% endblock %}
+{% block scripts %}
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+var ctx = document.getElementById("myChart").getContext("2d");
+new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+      datasets: [
+        {
+          data: [12, 3, 2, 1, 8, 8, 2, 2, 3, 5, 7, 1]
+        }
+      ]
+    },
+    options: {
+      annotation: {
+        annotations: [
+          {
+            type: "line",
+            mode: "horizontal",
+            scaleID: "y-axis-0",
+            value: "2",
+            borderColor: "red",
+            label: {
+              content: "TODAY",
+              enabled: true,
+              position: "top"
+            }
+          }
+        ]
+      }
+    }
+  }
+);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<p>下面是黄谷辉的It is now {{ current_date }}</p>
+<div style="width: 2000px"><canvas id="myChart" style="width:100%; height:400px;" ></canvas></div>
+{% endblock %}
+

@@ -1,0 +1,31 @@
+{% extends "bootstrap_ui/bootstrap4-skeleton.html" %}
+{% block head-title %}
+    {{show_title}}
+{% endblock %}
+{% block head-javascript %}
+  <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+{% endblock %}
+{% block body-content %}
+  <div class="container">
+  {% include "dateapp/med_nav.html" %}
+  <h1>This is the patient Info.</h1>
+  <ul class="list-group">
+    {% for key, value in patientData.items %}
+      <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ value }}">
+        {{ key }}: {{ value }}
+      </button>
+    {% endfor %}
+  </ul>
+  </div>
+
+{% endblock %}
+
+{% block body-javascript %}
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $(".list-group-item").on("click", function(e) {
+      alert("asasas");
+    })
+  });
+  </script>
+{% endblock %}

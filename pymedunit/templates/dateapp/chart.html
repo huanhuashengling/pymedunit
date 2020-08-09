@@ -1,0 +1,134 @@
+{% extends "bootstrap_ui/bootstrap4-skeleton.html" %}
+
+{% block head-title %}{{ show_title }}{% endblock %}
+{% block head-extension %}
+    <style type="text/css">
+      .anyClass {
+        width:1500px;
+        overflow-x: scroll;
+      }
+    </style>
+{% endblock %}
+
+{% block head-javascript %}
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
+
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"></script> -->
+
+</script>
+{% endblock %}
+
+{% block body-content %}
+  <div class="container">
+    {% include "dateapp/med_nav.html" %}
+    <select class="form-control" id="org" name="org_list" onChange="redirectUrl()">
+      <option value="" selected="selected">---SELECT---</option>
+      {% for org in organisation %}
+       <option value="{{org.id}}"
+         {% if org == current_org %}selected="selected"{% endif %}>
+         {{org.name|capfirst}}
+       </option>
+      {% endfor %}
+      </select>
+    <div style="overflow: scroll"><div style="min-width: 1000px;"><canvas id="myChart"  style="width:3500px; height:400px;"></canvas></div></div>
+  </div>
+{% endblock %}
+
+{% block body-javascript %}
+  <script type="text/javascript">
+  $(document).ready(function() {
+  var endpoint = '{% url "api-data" %}'
+  var defaultData = []
+  var labels = []
+  var title = ""
+  $.ajax({
+      method: 'GET',
+      url: endpoint,
+      success: function(data){
+          labels = data.labels
+          defaultData = data.data
+          title = data.title
+          setChart();
+      },
+      error: function(error_data){
+        console.log('error'); 
+      }
+  })  
+
+function setChart(){
+    var ctx = document.getElementById("myChart").getContext("2d");
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+            labels: labels, // 這裡
+            datasets: [{
+                label: title,
+                data: defaultData, // 和這裡
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]},
+      options: {
+        annotation: {
+          annotations: [
+            {
+              type: "line",
+              mode: "horizontal",
+              scaleID: "y-axis-0",
+              value: "3.50",
+              borderColor: "red",
+              label: {
+                // content: "起",
+                // enabled: true,
+                // position: "center"
+              }
+            },
+            {
+              type: "line",
+              mode: "horizontal",
+              scaleID: "y-axis-0",
+              value: "9.50",
+              borderColor: "red",
+              label: {
+                // content: "止",
+                // enabled: true,
+                // position: "center"
+              }
+            }
+          ]
+        },
+        responsive: true,
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true,
+                      stepSize: 1,
+                  }
+              }]
+          }
+      }
+  });
+
+}
+})
+  </script>
+{% endblock %}
+
