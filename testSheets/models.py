@@ -79,4 +79,39 @@ class LabInfoETZ(models.Model):
     class Meta:
         db_table = 'lab_info_ETZs'
 
+class InvestigatePlate(models.Model):
+    plate_title = models.CharField(max_length=50)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'investigate_plates'
+
+class InvestigateProject(models.Model):
+    project_title = models.CharField(max_length=50)
+    investigate_plates_id = models.IntegerField()
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'investigate_projects'
+
+class InvestigateIndicator(models.Model):
+    indicator_title = models.CharField(max_length=50)
+    investigate_projects_id = models.IntegerField()
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'investigate_indicators'
+
+class InvestigateItem(models.Model):
+    item_title = models.CharField(max_length=50)
+    investigate_indicators_id = models.IntegerField()
+    is_shown = models.BooleanField()
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'investigate_items'
 
