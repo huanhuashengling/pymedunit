@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect
 from testSheets.models import TestSheet, LaboratoryReport, LaboratoryLog, LaboratoryItem, LabInfoETZ
+from testSheets.models import InvestigatePlate, InvestigateProject, InvestigateIndicator, InvestigateItem
 import datetime
 import time
 from bs4 import BeautifulSoup
@@ -8,8 +9,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from datetime import datetime
 import os
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Count
+from django.core import serializers
 
 def hello(request):
   return HttpResponse("Hello world")
@@ -189,16 +191,15 @@ def chart(request):
   labItems = LaboratoryItem.objects.values_list("laboratory_item_label", "refer_value" ).first()
   return render(request, 'dateapp/chart.html', {"show_title": "Chart趋势图表", 'patientData': "patientData!"})
 
-def get_data(request, *args, **kwargs):
-  filterItem = "白细胞计数"
-  patientName = "谢申贵"
+def get_item_chart_data(request, username, item_id):
   data = []
   labels = []
+  investigateItem =  InvestigateItem.objects.filter(id=item_id).first()
 
-  labItem = LaboratoryItem.objects.filter(laboratory_item_label=filterItem).first()
-  print(labItem.id, filterItem)
-  labReports = LaboratoryReport.objects.filter(patient_name="谢申贵").order_by("collect_time").all()
-  # print(labReports)
+  labItem = LaboratoryItem.objects.filter(laboratory_item_label=investigateItem.item_title).first()
+  print(labItem.id, labItem.laboratory_item_label, username)
+  labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
+  print(labReports)
   for labReport in labReports:
     labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(laboratory_items_id=labItem.id).first()
     if labLog:
@@ -211,7 +212,7 @@ def get_data(request, *args, **kwargs):
   content = {
       'data': data,
       'labels': labels,
-      'title': patientName + " - " + filterItem
+      'title': username + " - " + labItem.laboratory_item_label
   }
   print(data)
   return JsonResponse(content)
@@ -224,17 +225,33 @@ def patient_list(request):
   return render(request, 'dateapp/patient_list.html', {"show_title": "Patient List", 'patientDatas': patientDatas})
 
 def patient_info(request, username):
-  patientData = LaboratoryReport.objects.filter(patient_name=username).first()
+  investigatePlates = InvestigatePlate.objects.all()
+  return render(request, 'dateapp/patient_info.html', {"show_title": "Patient Info", 'investigatePlates': investigatePlates, 'username': username})
 
-  LabInfoETZData = LabInfoETZ.objects.values('lab_info_Z', 'lab_info_E')
-  LabInfoETZArr = {}
-  for LabInfoETZItem in LabInfoETZData:
-    # print(LabInfoETZItem['lab_info_E'])
-    # itemname = LabInfoETZItem['lab_info_E']
-    # print(getattr(patientData, itemname))
-    LabInfoETZArr[LabInfoETZItem['lab_info_Z']] = getattr(patientData, LabInfoETZItem['lab_info_E'])
-  print(LabInfoETZArr)
-  return render(request, 'dateapp/patient_info.html', {"show_title": "Patient Info", 'patientData': LabInfoETZArr})
+def get_investigate_project_data(request, plate_id):
+  # investigateProjects = serializers.serialize("json", InvestigateProject.objects.filter(investigate_plates_id=plate_id).all())
+  investigateProjects =  InvestigateProject.objects.filter(investigate_plates_id=plate_id).all()
+  projectSelectHtml = "<option value=''>请选择</option>";
+  for investigateProject in investigateProjects:
+    projectSelectHtml += "<option value='" + str(investigateProject.id) + "'>" + investigateProject.project_title + "</option>"
+  print(projectSelectHtml)
+  return HttpResponse(projectSelectHtml)
+
+def get_investigate_indicator_data(request, project_id):
+  investigateIndicators =  InvestigateIndicator.objects.filter(investigate_projects_id=project_id).all()
+  indicatorSelectHtml = "<option value=''>请选择</option>";
+  for investigateIndicator in investigateIndicators:
+    indicatorSelectHtml += "<option value='" + str(investigateIndicator.id) + "'>" + investigateIndicator.indicator_title + "</option>"
+  print(indicatorSelectHtml)
+  return HttpResponse(indicatorSelectHtml)
+
+def get_investigate_item_data(request, indicator_id):
+  investigateItems =  InvestigateItem.objects.filter(investigate_indicators_id=indicator_id).all()
+  itemSelectHtml = "<option value=''>请选择</option>";
+  for investigateItem in investigateItems:
+    itemSelectHtml += "<option value='" + str(investigateItem.id) + "'>" + investigateItem.item_title + "</option>"
+  print(itemSelectHtml)
+  return HttpResponse(itemSelectHtml)
 
 # def add(request):
 #     if request.method == 'POST':

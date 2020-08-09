@@ -29,6 +29,10 @@ urlpatterns = [
     re_path(r'^insert/', views.insert),
     re_path(r'^chart/', views.chart),
     re_path(r'^patient_list/', views.patient_list),
-    re_path(r'^api/data/$', views.get_data, name='api-data'),
+    path('item_chart/<username>/<item_id>', views.get_item_chart_data, name='get_item_chart_data'),
+    # re_path(r'^get_investigate_project_data/$', views.get_investigate_project_data, name='get_investigate_project_data'),
+    path('get_investigate_project_data/<plate_id>/', views.get_investigate_project_data, name='get_investigate_project_data'),
+    path('get_investigate_indicator_data/<project_id>/', views.get_investigate_indicator_data, name='get_investigate_indicator_data'),
+    path('get_investigate_item_data/<indicator_id>/', views.get_investigate_item_data, name='get_investigate_item_data'),
     
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

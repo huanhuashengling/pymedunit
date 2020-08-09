@@ -4,18 +4,55 @@
 {% endblock %}
 {% block head-javascript %}
   <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
 {% endblock %}
 {% block body-content %}
   <div class="container">
   {% include "dateapp/med_nav.html" %}
-  <h1>This is the patient Info.</h1>
-  <ul class="list-group">
-    {% for key, value in patientData.items %}
-      <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ value }}">
-        {{ key }}: {{ value }}
-      </button>
-    {% endfor %}
-  </ul>
+  <h1>{{username}} 的化验图表</h1>
+  <input type="hidden" name="" id="patient_name" value="{{username}}">
+  <div class="row">
+    <div class="col">
+      <div class="form-group">
+        <label for="plateSelect">检查板块</label>
+        <select class="form-control" id="plateSelect">
+          <option value="">请选择</option>
+          {% for investigatePlate in investigatePlates %}
+            <option value="{{ investigatePlate.id }}">{{ investigatePlate.plate_title }}</option> | 
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="form-group">
+        <label for="projectSelect">检查项目</label>
+        <select class="form-control" id="projectSelect">
+          <option value="">请选择</option>
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="form-group">
+        <label for="indicatorSelect">检查指标</label>
+        <select class="form-control" id="indicatorSelect">
+          <option value="">请选择</option>
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="form-group ">
+        <label for="itemSelect">检查项</label>
+        <select class="form-control hidden" id="itemSelect">
+          <option value="">请选择</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+    <div style="overflow: scroll"><div><canvas id="myChart" width="2000" height="400"></canvas></div></div>
+
   </div>
 
 {% endblock %}
@@ -23,9 +60,156 @@
 {% block body-javascript %}
   <script type="text/javascript">
   $(document).ready(function() {
-    $(".list-group-item").on("click", function(e) {
-      alert("asasas");
-    })
+    $("#plateSelect").on("change", function(e) {
+      if (0 != $(this).val()){
+        var endpoint = '/get_investigate_project_data/' + $(this).val();
+        $.ajax({
+          method: 'GET',
+          url: endpoint,
+          data: {plate_id: $(this).val()},
+          success: function(data){
+              console.log(data);
+              $("#projectSelect").html(data);
+              // setChart();
+          },
+          error: function(error_data){
+            console.log('error'); 
+          }
+        }) 
+      }
+    });
+
+
+    $(document)
+      .on('change', '#projectSelect', function (e) {
+        e.preventDefault();
+        if (0 != $(this).val()){
+          var endpoint = '/get_investigate_indicator_data/' + $(this).val();
+          $.ajax({
+            method: 'GET',
+            url: endpoint,
+            data: {plate_id: $(this).val()},
+            success: function(data){
+                console.log(data);
+                $("#indicatorSelect").html(data);
+                // setChart();
+            },
+            error: function(error_data){
+              console.log('error'); 
+            }
+          }) 
+        }
+      })
+      .on('change', '#indicatorSelect', function (e) {
+        e.preventDefault();
+        if (0 != $(this).val()){
+          var endpoint = '/get_investigate_item_data/' + $(this).val();
+          $.ajax({
+            method: 'GET',
+            url: endpoint,
+            data: {plate_id: $(this).val()},
+            success: function(data){
+                console.log(data);
+                $("#itemSelect").html(data);
+                // setChart();
+            },
+            error: function(error_data){
+              console.log('error'); 
+            }
+          }) 
+        }
+      })
+      .on('change', '#itemSelect', function (e) {
+        e.preventDefault();
+        if (0 != $(this).val()){
+          var endpoint = '/item_chart/' + $("#patient_name").val() + "/" + $(this).val();
+          $.ajax({
+            method: 'GET',
+            url: endpoint,
+            data: {plate_id: $(this).val()},
+            success: function(data){
+                console.log(data);
+                labels = data.labels
+                defaultData = data.data
+                title = data.title
+                setChart(labels, defaultData, title);
+            },
+            error: function(error_data){
+              console.log('error'); 
+            }
+          }) 
+        }
+      });
   });
+
+  function setChart(labels, defaultData, title){
+    var ctx = document.getElementById("myChart").getContext("2d");
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+            labels: labels, // 這裡
+            datasets: [{
+                label: title,
+                data: defaultData, // 和這裡
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]},
+      options: {
+        annotation: {
+          annotations: [
+            {
+              type: "line",
+              mode: "horizontal",
+              scaleID: "y-axis-0",
+              value: "3.50",
+              borderColor: "red",
+              label: {
+                // content: "起",
+                // enabled: true,
+                // position: "center"
+              }
+            },
+            {
+              type: "line",
+              mode: "horizontal",
+              scaleID: "y-axis-0",
+              value: "9.50",
+              borderColor: "red",
+              label: {
+                // content: "止",
+                // enabled: true,
+                // position: "center"
+              }
+            }
+          ]
+        },
+        responsive: true,
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true,
+                      stepSize: 1,
+                  }
+              }]
+          }
+      }
+  });
+
+}
   </script>
 {% endblock %}
