@@ -21,15 +21,13 @@ from django.urls import path, include, re_path
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('hello/', views.hello),
+    # path('admin/', admin.site.urls),
     path('patient_info/<username>/', views.patient_info),
-    re_path(r'^time/$', views.current_datetime),
-    re_path(r'^time/plus/(\d{1,2})/$', views.hours_ahead),
     re_path(r'^insert/', views.insert),
     re_path(r'^chart/', views.chart),
     re_path(r'^patient_list/', views.patient_list),
     path('item_chart/<username>/<item_id>', views.get_item_chart_data, name='get_item_chart_data'),
+    path('items_chart/<username>/<indicator_id>', views.get_items_chart_data, name='get_items_chart_data'),
     # re_path(r'^get_investigate_project_data/$', views.get_investigate_project_data, name='get_investigate_project_data'),
     path('get_investigate_project_data/<plate_id>/', views.get_investigate_project_data, name='get_investigate_project_data'),
     path('get_investigate_indicator_data/<project_id>/', views.get_investigate_indicator_data, name='get_investigate_indicator_data'),

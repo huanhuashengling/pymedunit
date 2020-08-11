@@ -10,29 +10,8 @@ from django.conf.urls.static import static
 from datetime import datetime
 import os
 from django.http import JsonResponse, HttpResponse
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.core import serializers
-
-def hello(request):
-  return HttpResponse("Hello world")
-
-def current_datetime(request):
-  current_date = datetime.datetime.now()
-  #html = t.render({'current_date': now}) # Context({'current_date': now}) context must be a dict rather than Context.
-  return render(request, 'dateapp/current_datetime.html', locals())
-
-def hours_ahead(request, hour_offset):
-  try:
-    hour_offset = int(hour_offset)
-  except ValueError:
-    raise Http404()
-  next_time = datetime.datetime.now() + datetime.timedelta(hours=hour_offset)
-  return render(request, 'dateapp/hours_ahead.html', locals())
-
-  # Create your views here.
-def home(request):
-    # 主页将所有的数据库数据返回
-    return render(request, 'dateapp/home.html', {"show_title": "所有诗词信息", "testSheets": TestSheet.objects.all()})
 
 def insert(request):
   LabInfoETZData = LabInfoETZ.objects.values('lab_info_Z', 'lab_info_E')
@@ -176,7 +155,7 @@ def insert(request):
 
           labLog.save()
     # break
-  return render(request, 'dateapp/home.html', {"show_title": title, 'current_date': title})
+  return render(request, 'test_sheet/home.html', {"show_title": title, 'current_date': title})
 
 def splitReferValue(str):
   if "～" in str: 
@@ -189,44 +168,67 @@ def chart(request):
   patientData = LaboratoryReport.objects.values('patient_name').annotate(dcount=Count('patient_name'))
   print(patientData)
   labItems = LaboratoryItem.objects.values_list("laboratory_item_label", "refer_value" ).first()
-  return render(request, 'dateapp/chart.html', {"show_title": "Chart趋势图表", 'patientData': "patientData!"})
+  return render(request, 'test_sheet/chart.html', {"show_title": "Chart趋势图表", 'patientData': "patientData!"})
+
+def get_items_chart_data(request, username, indicator_id):
+  itemsData = []
+  investigateItems =  InvestigateItem.objects.filter(investigate_indicators_id=indicator_id).all()
+  for investigateItem in investigateItems:
+    itemsData.append(get_item_chart_common(request, username, investigateItem.id))
+  return JsonResponse(itemsData, safe=False)
 
 def get_item_chart_data(request, username, item_id):
+  content = get_item_chart_common(request, username, item_id)
+  return JsonResponse(content)
+
+def get_item_chart_common(request, username, item_id):
   data = []
   labels = []
+  referValue = "";
   investigateItem =  InvestigateItem.objects.filter(id=item_id).first()
 
   labItem = LaboratoryItem.objects.filter(laboratory_item_label=investigateItem.item_title).first()
-  print(labItem.id, labItem.laboratory_item_label, username)
+  jzLabItem = LaboratoryItem.objects.filter(laboratory_item_label="急诊" + investigateItem.item_title).first()
+  query = ""
+  
+  if not labItem is None and not jzLabItem is None:
+    query = Q(laboratory_items_id=labItem.id) | Q(laboratory_items_id=jzLabItem.id)
+  elif not labItem is None:
+    query = Q(laboratory_items_id=labItem.id)
+  elif not jzLabItem is None:
+    query = Q(laboratory_items_id=jzLabItem.id)
+  # print(query)
+  # print(labItem.id, labItem.laboratory_item_label, username)
   labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
-  print(labReports)
+  # print(labReports)
   for labReport in labReports:
-    labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(laboratory_items_id=labItem.id).first()
+    # labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(laboratory_items_id=labItem.id).first()
+    labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(query).first()
     if labLog:
+      referValue = dealWithReferValue(labItem.refer_value)
       data.append(labLog.result_value)
       # value = datetime.strptime(labReport.collect_time, "%Y-%m-%d %H:%M:%S")
       tCollectTime = labReport.collect_time.strftime("%m月%d日 %H:%M")
       labels.append(tCollectTime)
-      print(labReport.id, labLog.id, labItem.refer_value, labLog.result_value, labLog.towards, tCollectTime)
+      # print(labReport.id, labLog.id, labItem.refer_value, labLog.result_value, labLog.towards, tCollectTime)
     
   content = {
       'data': data,
       'labels': labels,
+      'refer_value': referValue,
       'title': username + " - " + labItem.laboratory_item_label
   }
-  print(data)
-  return JsonResponse(content)
-
+  return content;
 
 def patient_list(request):
   patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
-  print(patientDatas[0]["patient_name"])
+  # print(patientDatas[0]["patient_name"])
   # print(patientDatas[0])
-  return render(request, 'dateapp/patient_list.html', {"show_title": "Patient List", 'patientDatas': patientDatas})
+  return render(request, 'test_sheet/patient_list.html', {"show_title": "Patient List", 'patientDatas': patientDatas})
 
 def patient_info(request, username):
   investigatePlates = InvestigatePlate.objects.all()
-  return render(request, 'dateapp/patient_info.html', {"show_title": "Patient Info", 'investigatePlates': investigatePlates, 'username': username})
+  return render(request, 'test_sheet/patient_info.html', {"show_title": "Patient Info", 'investigatePlates': investigatePlates, 'username': username})
 
 def get_investigate_project_data(request, plate_id):
   # investigateProjects = serializers.serialize("json", InvestigateProject.objects.filter(investigate_plates_id=plate_id).all())
@@ -234,7 +236,7 @@ def get_investigate_project_data(request, plate_id):
   projectSelectHtml = "<option value=''>请选择</option>";
   for investigateProject in investigateProjects:
     projectSelectHtml += "<option value='" + str(investigateProject.id) + "'>" + investigateProject.project_title + "</option>"
-  print(projectSelectHtml)
+  # print(projectSelectHtml)
   return HttpResponse(projectSelectHtml)
 
 def get_investigate_indicator_data(request, project_id):
@@ -242,7 +244,7 @@ def get_investigate_indicator_data(request, project_id):
   indicatorSelectHtml = "<option value=''>请选择</option>";
   for investigateIndicator in investigateIndicators:
     indicatorSelectHtml += "<option value='" + str(investigateIndicator.id) + "'>" + investigateIndicator.indicator_title + "</option>"
-  print(indicatorSelectHtml)
+  # print(indicatorSelectHtml)
   return HttpResponse(indicatorSelectHtml)
 
 def get_investigate_item_data(request, indicator_id):
@@ -250,8 +252,15 @@ def get_investigate_item_data(request, indicator_id):
   itemSelectHtml = "<option value=''>请选择</option>";
   for investigateItem in investigateItems:
     itemSelectHtml += "<option value='" + str(investigateItem.id) + "'>" + investigateItem.item_title + "</option>"
-  print(itemSelectHtml)
+  # print(itemSelectHtml)
   return HttpResponse(itemSelectHtml)
+
+def dealWithReferValue(referValue):
+  result = []
+  if referValue.find("～"):
+    result.append(referValue.split("～")[0])
+    result.append(referValue.split("～")[1])
+  return result
 
 # def add(request):
 #     if request.method == 'POST':

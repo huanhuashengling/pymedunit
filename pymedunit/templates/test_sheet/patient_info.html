@@ -10,7 +10,7 @@
 {% endblock %}
 {% block body-content %}
   <div class="container">
-  {% include "dateapp/med_nav.html" %}
+  {% include "test_sheet/med_nav.html" %}
   <h1>{{username}} 的化验图表</h1>
   <input type="hidden" name="" id="patient_name" value="{{username}}">
   <div class="row">
@@ -51,7 +51,14 @@
     </div>
   </div>
 
-    <div style="overflow: scroll"><div><canvas id="myChart" width="2000" height="400"></canvas></div></div>
+    <canvas id="chart1" width="1000" height="400"></canvas>
+    <div id="graph-container2"><canvas id="chart2" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container3"><canvas id="chart3" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container4"><canvas id="chart4" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container5"><canvas id="chart5" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container6"><canvas id="chart6" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container7"><canvas id="chart7" class="other-graph" width="1000" height="400"></canvas></div>
+    <div id="graph-container8"><canvas id="chart8" class="other-graph" width="1000" height="400"></canvas></div>
 
   </div>
 
@@ -90,7 +97,7 @@
             url: endpoint,
             data: {plate_id: $(this).val()},
             success: function(data){
-                console.log(data);
+                // console.log(data);
                 $("#indicatorSelect").html(data);
                 // setChart();
             },
@@ -109,9 +116,26 @@
             url: endpoint,
             data: {plate_id: $(this).val()},
             success: function(data){
-                console.log(data);
+                // console.log(data);
                 $("#itemSelect").html(data);
                 // setChart();
+            },
+            error: function(error_data){
+              console.log('error'); 
+            }
+          });
+
+          var endpoint = '/items_chart/' + $("#patient_name").val() + "/" + $(this).val();
+          $.ajax({
+            method: 'GET',
+            url: endpoint,
+            data: {plate_id: $(this).val()},
+            success: function(data){
+                clearOtherChart();
+                for(item in data) {
+                  setChart("chart"+(parseInt(item)+1), data[item].labels, data[item].data, data[item].title, data[item].refer_value);
+                }
+                // setChart(data.labels, data.data, data.title, data.refer_value);
             },
             error: function(error_data){
               console.log('error'); 
@@ -128,11 +152,9 @@
             url: endpoint,
             data: {plate_id: $(this).val()},
             success: function(data){
-                console.log(data);
-                labels = data.labels
-                defaultData = data.data
-                title = data.title
-                setChart(labels, defaultData, title);
+                // console.log(data);
+                clearOtherChart();
+                setChart("chart1", data.labels, data.data, data.title, data.refer_value);
             },
             error: function(error_data){
               console.log('error'); 
@@ -142,31 +164,29 @@
       });
   });
 
-  function setChart(labels, defaultData, title){
-    var ctx = document.getElementById("myChart").getContext("2d");
-    new Chart(ctx, {
+  function clearOtherChart() {
+    $('.other-graph').remove(); // this is my <canvas> element
+    $('#graph-container2').append('<canvas id="chart2" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container3').append('<canvas id="chart3" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container4').append('<canvas id="chart4" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container5').append('<canvas id="chart5" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container6').append('<canvas id="chart6" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container7').append('<canvas id="chart7" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container8').append('<canvas id="chart8" class="other-graph"  width="1000" height="400"><canvas>');
+  }
+
+  function setChart(chartName, labels, defaultData, title, refer_value){
+    var ctx = document.getElementById(chartName).getContext("2d");
+    this["chartObj2"] = new Chart(ctx, {
       type: 'line',
       data: {
             labels: labels, // 這裡
             datasets: [{
                 label: title,
+                fill: false,
                 data: defaultData, // 和這裡
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
+                backgroundColor: "black",
+                borderColor: "black",
                 borderWidth: 1
             }]},
       options: {
@@ -176,8 +196,8 @@
               type: "line",
               mode: "horizontal",
               scaleID: "y-axis-0",
-              value: "3.50",
-              borderColor: "red",
+              value: refer_value[0],
+              borderColor: "blue",
               label: {
                 // content: "起",
                 // enabled: true,
@@ -188,7 +208,7 @@
               type: "line",
               mode: "horizontal",
               scaleID: "y-axis-0",
-              value: "9.50",
+              value: refer_value[1],
               borderColor: "red",
               label: {
                 // content: "止",
@@ -202,8 +222,10 @@
           scales: {
               yAxes: [{
                   ticks: {
-                      beginAtZero: true,
-                      stepSize: 1,
+                    // suggestedmin: parseInt(refer_value[0]) - 10,
+                    // suggestedmax: parseInt(refer_value[1]) + 10,
+                    beginAtZero: true,
+                    stepSize: 1,
                   }
               }]
           }
