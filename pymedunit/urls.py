@@ -21,7 +21,7 @@ from django.urls import path, include, re_path
 from . import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('patient_info/<username>/', views.patient_info),
     re_path(r'^insert/', views.insert),
     re_path(r'^chart/', views.chart),
@@ -33,4 +33,11 @@ urlpatterns = [
     path('get_investigate_indicator_data/<project_id>/', views.get_investigate_indicator_data, name='get_investigate_indicator_data'),
     path('get_investigate_item_data/<indicator_id>/', views.get_investigate_item_data, name='get_investigate_item_data'),
     
+    re_path(r'sheet_upload/', views.sheet_upload, name='sheet_upload'),     #上传页面显示
+    re_path(r'att_upload/', views.attachment_upload, name='att_upload'),    #处理上传请求
+    # re_path(r'del_doc_file/', views.del_doc_file, name='del_doc_file'),     #单个删除
+    # re_path(r'del_all_att/', views.del_all_att, name='del_all_att'),        #批量删除
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# 上传文件url路径
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

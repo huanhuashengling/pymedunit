@@ -51,14 +51,14 @@
     </div>
   </div>
 
-    <canvas id="chart1" width="1000" height="400"></canvas>
-    <div id="graph-container2"><canvas id="chart2" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container3"><canvas id="chart3" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container4"><canvas id="chart4" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container5"><canvas id="chart5" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container6"><canvas id="chart6" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container7"><canvas id="chart7" class="other-graph" width="1000" height="400"></canvas></div>
-    <div id="graph-container8"><canvas id="chart8" class="other-graph" width="1000" height="400"></canvas></div>
+    <canvas id="chart1"></canvas>
+    <div id="graph-container2"><canvas id="chart2" class="other-graph"></canvas></div>
+    <div id="graph-container3"><canvas id="chart3" class="other-graph"></canvas></div>
+    <div id="graph-container4"><canvas id="chart4" class="other-graph"></canvas></div>
+    <div id="graph-container5"><canvas id="chart5" class="other-graph"></canvas></div>
+    <div id="graph-container6"><canvas id="chart6" class="other-graph"></canvas></div>
+    <div id="graph-container7"><canvas id="chart7" class="other-graph"></canvas></div>
+    <div id="graph-container8"><canvas id="chart8" class="other-graph"></canvas></div>
 
   </div>
 
@@ -166,19 +166,20 @@
 
   function clearOtherChart() {
     $('.other-graph').remove(); // this is my <canvas> element
-    $('#graph-container2').append('<canvas id="chart2" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container3').append('<canvas id="chart3" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container4').append('<canvas id="chart4" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container5').append('<canvas id="chart5" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container6').append('<canvas id="chart6" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container7').append('<canvas id="chart7" class="other-graph"  width="1000" height="400"><canvas>');
-    $('#graph-container8').append('<canvas id="chart8" class="other-graph"  width="1000" height="400"><canvas>');
+    $('#graph-container2').append('<canvas id="chart2" class="other-graph"><canvas>');
+    $('#graph-container3').append('<canvas id="chart3" class="other-graph"><canvas>');
+    $('#graph-container4').append('<canvas id="chart4" class="other-graph"><canvas>');
+    $('#graph-container5').append('<canvas id="chart5" class="other-graph"><canvas>');
+    $('#graph-container6').append('<canvas id="chart6" class="other-graph"><canvas>');
+    $('#graph-container7').append('<canvas id="chart7" class="other-graph"><canvas>');
+    $('#graph-container8').append('<canvas id="chart8" class="other-graph"><canvas>');
   }
 
   function setChart(chartName, labels, defaultData, title, refer_value){
     var ctx = document.getElementById(chartName).getContext("2d");
     this["chartObj2"] = new Chart(ctx, {
       type: 'line',
+      height: 400,
       data: {
             labels: labels, // 這裡
             datasets: [{
