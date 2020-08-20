@@ -266,7 +266,7 @@ def dealWithReferValue(referValue):
   return result
 
 def sheet_upload(request):
-  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload"})
+  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload", 'patientDatas': "asasasasas"})
 
 def attachment_upload(request):
   att_file = request.FILES.get('attachment', None)
