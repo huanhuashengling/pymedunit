@@ -3,12 +3,14 @@
     {{show_title}}
 {% endblock %}
 {% block head-javascript %}
-  <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script> -->
 {% endblock %}
 {% block body-content %}
   <div class="container">
   {% include "test_sheet/med_nav.html" %}
   <h1>This is the patient list.</h1>
+  {% csrf_token %}
   <ul class="list-group">
     {% for patient in patientDatas %}
       <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ patient.patient_name }}">
