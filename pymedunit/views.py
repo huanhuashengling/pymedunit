@@ -223,11 +223,9 @@ def get_item_chart_common(request, username, item_id):
   return content;
 
 def patient_list(request):
-  # patientDatas = [];
   patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
   # print(patientDatas[0]["patient_name"])
-  print(patientDatas)
-  return render(request, 'test_sheet/patient_list.html', {"show_title": "Patient List", 'patientDatas': "asasasasas"})
+  return render(request, 'test_sheet/patient_list.html', {"show_title": "Patient List", 'patientDatas': patientDatas})
 
 def patient_info(request, username):
   investigatePlates = InvestigatePlate.objects.all()
@@ -266,9 +264,7 @@ def dealWithReferValue(referValue):
   return result
 
 def sheet_upload(request):
-  patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
-
-  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload", 'patientDatas': patientDatas})
+  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload"})
 
 def attachment_upload(request):
   att_file = request.FILES.get('attachment', None)
