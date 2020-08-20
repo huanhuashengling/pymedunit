@@ -1,2 +1,4 @@
 /pymedunit/static/*.htm
 /pymedunit/static/*.mht
+/upload_files/*.htm
+/upload_files/*.mht

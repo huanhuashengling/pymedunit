@@ -1,4 +1,6 @@
 # pymedunit
+module pymysql rest_framework bs4 djangorestframework django-cors-headers chartjs django-bootstrap-ui lxml
+database install and migrate
 ## TODO
 1. Draw the horizontal refer value lines at chartjs canvas.[Finished]
 2. Make Chartjs canvas show well.[... Maybe current is good]
