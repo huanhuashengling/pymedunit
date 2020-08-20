@@ -16,7 +16,20 @@
   {% include "test_sheet/med_nav.html" %}
   <h1>Upload Test Sheet files here.</h1>
   {% csrf_token %}
-  {{patientDatas}}
+  <ul class="list-group">
+    {% for patient in patientDatas %}
+      <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ patient.patient_name }}">
+        <b>{{ patient.patient_name }}</b> | 
+        {{ patient.patient_age }} | 
+        {{ patient.patient_gender }} | 
+        {{ patient.medical_record_num }} | 
+        {{ patient.department }} | 
+        {{ patient.bed_no }} | 
+        {{ patient.clinical_diagnosis }} | 
+        <span class="badge badge-primary badge-pill">{{ patient.dcount }}</span>
+      </button>
+    {% endfor %}
+  </ul>
   <div class="file-loading">
     <input id="upload-file" type="file" name="attachment" multiple webkitdirectory />
     <!-- <input id="upload-folder" name="upload-folder[]" type="file" multiple> -->
