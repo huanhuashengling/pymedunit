@@ -25,7 +25,7 @@ urlpatterns = [
     path('patient_info/<username>/', views.patient_info),
     re_path(r'^insert/', views.insert),
     re_path(r'^chart/', views.chart),
-    re_path(r'^patient_list/', views.patient_list),
+    re_path(r'^patient_list/', views.patient_list, name='patient_list'),
     path('item_chart/<username>/<item_id>', views.get_item_chart_data, name='get_item_chart_data'),
     path('items_chart/<username>/<indicator_id>', views.get_items_chart_data, name='get_items_chart_data'),
     # re_path(r'^get_investigate_project_data/$', views.get_investigate_project_data, name='get_investigate_project_data'),
