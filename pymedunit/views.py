@@ -225,7 +225,8 @@ def get_item_chart_common(request, username, item_id):
 def patient_list(request):
   patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
   # print(patientDatas[0]["patient_name"])
-  return render(request, 'test_sheet/patient_list.html', {"show_title": "Patient List"})
+  patientName = patientDatas[0]["patient_name"]
+  return render(request, 'test_sheet/patient_list.html', {"show_title": "Patient List", "patientName": patientName})
 
 def patient_info(request, username):
   investigatePlates = InvestigatePlate.objects.all()
