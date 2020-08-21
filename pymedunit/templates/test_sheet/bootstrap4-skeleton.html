@@ -7,10 +7,10 @@
         <!-- Block head meta -->
         {% block head-meta %}
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        {% endblock %}
+        {% endblock head-meta %}
 
         <!-- Page title -->
-        <title>{% block head-title %}django-bootstrap-ui template{% endblock %}</title>
+        <title>{% block head-title %}django-bootstrap-ui template{% endblock head-title %}</title>
 
         <!-- Block head css -->
         {% block head-css %}
@@ -19,17 +19,17 @@
 
             <!-- Google material design icon font -->
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        {% endblock %}
+        {% endblock head-css %}
 
         <!-- Block head javascript -->
-        {% block head-javascript %}{% endblock %}
+        {% block head-javascript %}{% endblock head-javascript %}
 
         <!-- Block head extension -->
-        {% block head-extension %}{% endblock %}
+        {% block head-extension %}{% endblock head-extension%}
     </head>
     <body>
         <!-- Block body content -->
-        {% block body-content %}<h1>Hello, django-bootstrap-ui!</h1>{% endblock %}
+        {% block body-content %}<h1>Hello, django-bootstrap-ui!</h1>{% endblock body-content %}
 
         <!-- Block body javascript -->
         {% block body-javascript %}
@@ -39,6 +39,6 @@
 
             <!-- Include all compiled plugins (below), or include individual files as needed -->
             <script src="//stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-        {% endblock %}
+        {% endblock body-javascript %}
     </body>
 </html>
