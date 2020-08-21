@@ -265,7 +265,7 @@ def dealWithReferValue(referValue):
 
 def sheet_upload(request):
   # patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
-  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload"})
+  return render(request, 'test_sheet/sheet_upload.html', {"show_title": "Sheet Upload", 'patientDatas': patientDatas})
 
 def attachment_upload(request):
   att_file = request.FILES.get('attachment', None)
