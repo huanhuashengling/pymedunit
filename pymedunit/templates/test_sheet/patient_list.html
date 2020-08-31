@@ -3,7 +3,7 @@
     {{show_title}}
 {% endblock %}
 {% block head-javascript %}
-  <!-- <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script> -->
+  <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script> -->
 {% endblock %}
 {% block body-content %}
@@ -11,7 +11,20 @@
   {% include "test_sheet/med_nav.html" %}
   <h1>This is the patient list.</h1>
   {% csrf_token %}
-  <h2>{{patientName}}</h2>
+  <ul class="list-group">
+    {% for patient in patientDatas %}
+      <button type="button" class="list-group-item d-flex justify-content-between align-items-center" value="{{ patient.patient_name }}">
+        <b>{{ patient.patient_name }}</b> | 
+        {{ patient.patient_age }} | 
+        {{ patient.patient_gender }} | 
+        {{ patient.medical_record_num }} | 
+        {{ patient.department }} | 
+        {{ patient.bed_no }} | 
+        {{ patient.clinical_diagnosis }} | 
+        <span class="badge badge-primary badge-pill">{{ patient.dcount }}</span>
+      </button>
+    {% endfor %}
+  </ul>
   </div>
 
 {% endblock %}

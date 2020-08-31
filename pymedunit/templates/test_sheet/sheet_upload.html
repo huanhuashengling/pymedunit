@@ -16,8 +16,10 @@
   {% include "test_sheet/med_nav.html" %}
   <h1>Upload Test Sheet files here.</h1>
   {% csrf_token %}
+  <input type="hidden" id="relative-path" />
+  <input type="hidden" id="files-num" />
   <div class="file-loading">
-    <input id="upload-file" type="file" name="attachment" multiple webkitdirectory />
+    <input id="upload-file" type="file" name="attachment" onchange="selectFolder(event)" multiple directory webkitdirectory />
     <!-- <input id="upload-folder" name="upload-folder[]" type="file" multiple> -->
   </div>
   </div>
@@ -44,7 +46,7 @@
           hideThumbnailContent: true,
           autoReplace: true,  // 达到最大上传数时，自动替换之前的附件
           uploadExtraData: function () {  // uploadExtraData携带附加参数，上传时携带csrftoken
-              return {csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(), doc_uuid: $('[name=doc_uuid]').val()}
+              return {csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(), doc_uuid: $('[name=doc_uuid]').val(), relative_path: $("#relative-path").val(), sheet_num: $("#files-num").val()}
           },
           initialPreview :[],　　// 默认预览设置，回显时会用到
           initialPreviewConfig: [],　　// 默认预览的详细配置，回显时会用到
@@ -69,6 +71,14 @@
           // 加载预览后触发的事件，将所有文件名添加到全局变量 aryFiles 数组中
           aryFiles.push(file.name);
       })
+
   });
+  function selectFolder(e) {
+        var theFiles = e.target.files;
+        var relativePath = theFiles[0].webkitRelativePath;
+        var folder = relativePath.split("/");
+        $("#relative-path").val(folder[0]);
+        $("#files-num").val(theFiles.length);
+      }
   </script>
 {% endblock %}

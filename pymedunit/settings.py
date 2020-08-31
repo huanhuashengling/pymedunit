@@ -20,6 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'j0n7+)%45z00s@q4@wjah*87fcu%kk1yyjez8_l!)w*!@u@phu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -28,8 +29,8 @@ ALLOWED_HOSTS = []
 
 STATICFILES_DIRS = [(os.path.join(BASE_DIR,'static'))]
 
-MEDIA_URL = '/upload_files/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'upload_files')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [

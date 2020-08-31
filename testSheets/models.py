@@ -115,3 +115,14 @@ class InvestigateItem(models.Model):
     class Meta:
         db_table = 'investigate_items'
 
+class UploadSheetDir(models.Model):
+    patient_name = models.CharField(max_length=20)
+    medical_record_num = models.CharField(max_length=20)
+    dir_str = models.CharField(max_length=50)
+    sheet_num = models.IntegerField()
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'upload_sheet_dirs'
+
