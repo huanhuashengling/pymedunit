@@ -120,6 +120,7 @@ class UploadSheetDir(models.Model):
     medical_record_num = models.CharField(max_length=20)
     dir_str = models.CharField(max_length=50)
     sheet_num = models.IntegerField()
+    is_parsed = models.BooleanField(default=False)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
 

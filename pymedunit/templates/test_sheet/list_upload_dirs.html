@@ -1,0 +1,56 @@
+{% extends "./bootstrap4-skeleton.html" %}
+{% block head-title %}
+    {{show_title}}
+{% endblock %}
+{% block head-javascript %}
+  <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script> -->
+{% endblock %}
+{% block body-content %}
+  <div class="container">
+  {% include "test_sheet/med_nav.html" %}
+  <h4>化验单上传列表</h4>
+  {% csrf_token %}
+  <table class="table">
+    <tr><th>编号</th><th>病人姓名</th><th>病历号</th><th>化验单路径</th><th>化验单数量</th><th>是否已解析</th><th>操作</th></tr>
+    {% for uploadSheetDir in uploadSheetDirs %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ uploadSheetDir.patient_name }}</td>
+      <td>{{ uploadSheetDir.medical_record_num }}</td>
+      <td>{{ uploadSheetDir.dir_str }}</td>
+      <td>{{ uploadSheetDir.sheet_num }}</td>
+      <td id="is-parsed-{{ uploadSheetDir.id }}">{{ uploadSheetDir.is_parsed }}</td>
+      <td>
+        <button class="btn btn-warning clear-sheet-data-btn" value="{{ uploadSheetDir.id }}">清空数据</button>
+        <button class="btn btn-danger clear-sheet-files-btn" value="{{ uploadSheetDir.id }}">清空文件</button>
+        <button class="btn btn-info parse-read-btn" value="{{ uploadSheetDir.id }}">解析读取</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+
+{% endblock %}
+
+{% block body-javascript %}
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $(".parse-read-btn").on("click", function(e) {
+      var endpoint = '/parse_read_dir_sheet_data/';
+      $.ajax({
+        method: 'GET',
+        url: endpoint,
+        data: {uploadSheetDirId: $(this).val()},
+        success: function(data){
+            console.log(data);
+            $("#is-parsed-"+$(this).val()).text("True");
+        },
+        error: function(error_data){
+          console.log('error'); 
+        }
+      }) 
+    })
+  });
+  </script>
+{% endblock %}

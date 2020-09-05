@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect
-from testSheets.models import TestSheet, LaboratoryReport, LaboratoryLog, LaboratoryItem, LabInfoETZ
+from testSheets.models import TestSheet, LaboratoryReport, LaboratoryLog, LaboratoryItem, LabInfoETZ, UploadSheetDir
 from testSheets.models import InvestigatePlate, InvestigateProject, InvestigateIndicator, InvestigateItem
 import datetime
 import time
@@ -15,22 +15,34 @@ from django.core import serializers
 import re
 import json
 
-def insert(request):
+def list_upload_dirs(request):
+  uploadSheetDirs = UploadSheetDir.objects.all()
+  return render(request, 'test_sheet/list_upload_dirs.html', {"uploadSheetDirs": uploadSheetDirs, "show_title": "化验单上传列表"})
+
+def parse_read_dir_sheet_data(request):
+  uploadSheetDirId = request.GET.get('uploadSheetDirId', None)
+  uploadSheetDir = UploadSheetDir.objects.get(id=uploadSheetDirId)
+  dir_str = uploadSheetDir.dir_str
+
+  currPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media' + "/" + dir_str)
+
   LabInfoETZData = LabInfoETZ.objects.values('lab_info_Z', 'lab_info_E')
   LabInfoETZArr = {}
   for LabInfoETZItem in LabInfoETZData:
     LabInfoETZArr[LabInfoETZItem['lab_info_Z']] = LabInfoETZItem['lab_info_E']
   
   # print('details:', LabInfoETZArr)
-  files= os.listdir(os.path.join(settings.BASE_DIR, 'pymedunit/static'))
+  files= os.listdir(currPath)
   for filename in files: #遍历文件夹
     hasTheSameReport = False
+
     if "mht" in filename:
       continue
+      
     if not os.path.isdir(filename): #判断是否是文件夹，不是文件夹才打开
-      print(filename)
-
-      file = os.path.join(settings.BASE_DIR, 'pymedunit/static', filename)
+      # print(filename)
+      file = os.path.join(currPath, filename)
+      # file = os.path.join(settings.BASE_DIR, 'pymedunit/static', filename)
       # file = os.path.join(settings.BASE_DIR, 'pymedunit/static', "LisResult8.htm")
       with open(file, 'r', encoding='gbk') as f:
           html = f.read()
@@ -38,6 +50,10 @@ def insert(request):
       labReport = LaboratoryReport()    
       soup = BeautifulSoup(html, 'html.parser')
       tables = soup.find_all("table")
+
+      if len(tables) == 0:
+        continue
+
       title = tables[1].find('b').text.strip()
       labReport.title = title
 
@@ -51,8 +67,10 @@ def insert(request):
           if "申请单号" == key:
             tLabReport = LaboratoryReport.objects.filter(apply_num=value).first()
             if tLabReport:
-              print("tLabReport.id", tLabReport.id)
+              # print("tLabReport.id", tLabReport.id)
               hasTheSameReport = True
+
+          # print("key", key, " value ", value)
           setattr(labReport, LabInfoETZArr[key], value)
 
       if hasTheSameReport:
@@ -71,6 +89,8 @@ def insert(request):
               value = "1937-1-1 00:00:00"
 
             value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+          elif "年龄" in key :
+            value = table3tds[i+1].text.strip().replace(u'\xa0', '').replace(' ', '').replace('岁', '')
           else:
             value = table3tds[i+1].text.strip().replace(u'\xa0', '').replace(' ', '')
 
@@ -157,7 +177,11 @@ def insert(request):
 
           labLog.save()
     # break
-  return render(request, 'test_sheet/home.html', {"show_title": title, 'current_date': title})
+  
+  uploadSheetDir.is_parsed = True
+  uploadSheetDir.save()
+
+  return HttpResponse("success")
 
 def splitReferValue(str):
   if "～" in str: 

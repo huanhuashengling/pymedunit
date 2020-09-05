@@ -9,7 +9,7 @@
 {% block body-content %}
   <div class="container">
   {% include "test_sheet/med_nav.html" %}
-  <h1>This is the patient list.</h1>
+  <h4>已读取病人化验单数据列表.</h4>
   {% csrf_token %}
   <ul class="list-group">
     {% for patient in patientDatas %}

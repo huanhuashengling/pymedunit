@@ -23,7 +23,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('patient_info/<username>/', views.patient_info),
-    re_path(r'^insert/', views.insert),
+    re_path(r'^parse_read_dir_sheet_data/', views.parse_read_dir_sheet_data),
     re_path(r'^chart/', views.chart),
     re_path(r'^patient_list/', views.patient_list, name='patient_list'),
     path('item_chart/<username>/<item_id>', views.get_item_chart_data, name='get_item_chart_data'),
@@ -32,7 +32,9 @@ urlpatterns = [
     path('get_investigate_project_data/<plate_id>/', views.get_investigate_project_data, name='get_investigate_project_data'),
     path('get_investigate_indicator_data/<project_id>/', views.get_investigate_indicator_data, name='get_investigate_indicator_data'),
     path('get_investigate_item_data/<indicator_id>/', views.get_investigate_item_data, name='get_investigate_item_data'),
-    
+
+    path('list_upload_dirs/', views.list_upload_dirs, name='list_upload_dirs'),
+
     re_path(r'sheet_upload/', views.sheet_upload, name='sheet_upload'),     #上传页面显示
     re_path(r'att_upload/', views.attachment_upload, name='att_upload'),    #处理上传请求
     # re_path(r'del_doc_file/', views.del_doc_file, name='del_doc_file'),     #单个删除

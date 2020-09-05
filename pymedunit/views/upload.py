@@ -28,11 +28,13 @@ def attachment_upload(request):
   medical_record_num = relative_path.split("_")[1]
   
   uploadSheetDir = UploadSheetDir.objects.filter(patient_name=patient_name).filter(medical_record_num=medical_record_num).first()
+
   if not uploadSheetDir:
     result = UploadSheetDir.objects.create(patient_name=patient_name, 
       medical_record_num=medical_record_num, 
       dir_str=relative_path, 
       sheet_num=sheet_num)
+
   if att_file:
       currPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media' + "/" + relative_path)
       if not os.path.exists(currPath):
