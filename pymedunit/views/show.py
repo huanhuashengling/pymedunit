@@ -99,13 +99,8 @@ def get_item_chart_common(request, username, item_id):
   labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
   # print(labReports)
   for labReport in labReports:
-    labLog = "";
     # labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(laboratory_items_id=labItem.id).first()
-    try:
-      labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(query).first()
-    except:
-      # stack = pprint.pformat(traceback.extract_stack())
-      logging.debug('An error occurred: %s'% query)
+    labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(query).first()
     
     if labLog:
       referValue = dealWithReferValue(labItem.refer_value)
