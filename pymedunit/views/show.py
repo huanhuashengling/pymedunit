@@ -94,7 +94,7 @@ def get_item_chart_common(request, username, item_id):
     query = Q(laboratory_items_id=labItem.id)
   elif not jzLabItem is None:
     query = Q(laboratory_items_id=jzLabItem.id)
-  return serializers.serialize('json', [ query, ])
+
   # print(labItem.id, labItem.laboratory_item_label, username)
   labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
   # print(labReports)
