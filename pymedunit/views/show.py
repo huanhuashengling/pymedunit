@@ -15,6 +15,7 @@ from django.core import serializers
 import re
 import json
 import logging, traceback, pprint
+from django.core import serializers
 
 def patient_list(request):
   patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
@@ -93,7 +94,7 @@ def get_item_chart_common(request, username, item_id):
     query = Q(laboratory_items_id=labItem.id)
   elif not jzLabItem is None:
     query = Q(laboratory_items_id=jzLabItem.id)
-  return query
+  return serializers.serialize('json', [ query, ])
   # print(labItem.id, labItem.laboratory_item_label, username)
   labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
   # print(labReports)
