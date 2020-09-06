@@ -93,7 +93,7 @@ def get_item_chart_common(request, username, item_id):
     query = Q(laboratory_items_id=labItem.id)
   elif not jzLabItem is None:
     query = Q(laboratory_items_id=jzLabItem.id)
-  # print(query)
+  return query
   # print(labItem.id, labItem.laboratory_item_label, username)
   labReports = LaboratoryReport.objects.filter(patient_name=username).order_by("collect_time").all()
   # print(labReports)
@@ -105,7 +105,6 @@ def get_item_chart_common(request, username, item_id):
     except:
       # stack = pprint.pformat(traceback.extract_stack())
       logging.debug('An error occurred: %s'% query)
-      return
     
     if labLog:
       referValue = dealWithReferValue(labItem.refer_value)
@@ -121,4 +120,4 @@ def get_item_chart_common(request, username, item_id):
       'refer_value': referValue,
       'title': username + " - " + labItem.laboratory_item_label
   }
-  return content;
+  return content
