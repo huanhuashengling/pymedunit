@@ -14,6 +14,7 @@ from django.db.models import Count, Q
 from django.core import serializers
 import re
 import json
+import logging, traceback, pprint
 
 def patient_list(request):
   patientDatas = LaboratoryReport.objects.values('patient_name', "patient_age", "patient_gender", "medical_record_num", "department", "bed_no", "clinical_diagnosis").annotate(dcount=Count('patient_name'))
@@ -98,7 +99,12 @@ def get_item_chart_common(request, username, item_id):
   # print(labReports)
   for labReport in labReports:
     # labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(laboratory_items_id=labItem.id).first()
-    labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(query).first()
+    try:
+      labLog = LaboratoryLog.objects.filter(laboratory_reports_id=labReport.id).filter(query).first()
+    except:
+      # stack = pprint.pformat(traceback.extract_stack())
+      logging.debug('An error occurred: %s'% query)
+    
     if labLog:
       referValue = dealWithReferValue(labItem.refer_value)
       data.append(labLog.result_value)
