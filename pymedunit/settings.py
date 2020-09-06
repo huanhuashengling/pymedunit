@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,14 @@ SECRET_KEY = 'j0n7+)%45z00s@q4@wjah*87fcu%kk1yyjez8_l!)w*!@u@phu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+logging.basicConfig(
+    level = logging.DEBUG,
+    format ='%(asctime)s %(levelname)s %(message)s',
+    filename ='/tmp/myapp.log',
+    filemode ='w'
+)
+
+ALLOWED_HOSTS = ["*",]
 
 STATICFILES_DIRS = [(os.path.join(BASE_DIR,'static'))]
 
